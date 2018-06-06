@@ -1,9 +1,10 @@
 module Main exposing (main)
 
-import Html exposing (Html, button, div, span, text)
+import Html exposing (Html, table, tr, th, td, button, div, span, text, p)
+import Html.Events exposing (onClick)
 import Dict exposing (Dict)
-import List
 import Tuple
+import List
 
 
 type alias Quantity =
@@ -43,10 +44,43 @@ init =
     ( model, Cmd.none )
 
 
+tableHeader : Model -> Html Msg
+tableHeader model =
+    tr []
+        [ th [] [ text "labelsoort" ]
+        , th [] [ text "aantal vel" ]
+        , th [] [ text "labels per vel" ]
+        , th [] [ text "totaal # labels" ]
+        ]
+
+
+formatDataToHtml : ( Format, FormatData ) -> List (Html Msg)
+formatDataToHtml ( format, formatData ) =
+    let
+        ( quantity, capacity ) =
+            formatData
+
+        label =
+            format
+                ++ " : "
+                ++ toString quantity
+                ++ " stuks à "
+                ++ toString capacity
+                ++ " = "
+                ++ toString (quantity * capacity)
+                |> text
+    in
+        label
+            :: button [ onClick (Add format -1) ] [ text "-" ]
+            :: button [ onClick (Add format 1) ] [ text "+" ]
+            :: [ p [] [] ]
+
+
 viewFormatDetailsAndButtons : Model -> List (Html Msg)
 viewFormatDetailsAndButtons model =
-    -- TODO
-    [ text "Lorem Ipsum" ]
+    Dict.toList model
+        |> List.map formatDataToHtml
+        |> List.concat
 
 
 view : Model -> Html Msg
