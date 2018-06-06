@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Html exposing (Html, table, tr, th, td, button, div, span, text, p)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Tuple
@@ -44,48 +45,46 @@ init =
     ( model, Cmd.none )
 
 
-tableHeader : Model -> Html Msg
-tableHeader model =
+viewTableHeader : Model -> Html Msg
+viewTableHeader model =
     tr []
         [ th [] [ text "labelsoort" ]
         , th [] [ text "aantal vel" ]
         , th [] [ text "labels per vel" ]
         , th [] [ text "totaal # labels" ]
+        , th [] []
+        , th [] []
         ]
 
 
-formatDataToHtml : ( Format, FormatData ) -> List (Html Msg)
-formatDataToHtml ( format, formatData ) =
+viewFormatDataToTableRow : ( Format, FormatData ) -> Html Msg
+viewFormatDataToTableRow ( format, formatData ) =
     let
         ( quantity, capacity ) =
             formatData
 
-        label =
-            format
-                ++ " : "
-                ++ toString quantity
-                ++ " stuks à "
-                ++ toString capacity
-                ++ " = "
-                ++ toString (quantity * capacity)
-                |> text
+        total =
+            quantity * capacity
     in
-        label
-            :: button [ onClick (Add format -1) ] [ text "-" ]
-            :: button [ onClick (Add format 1) ] [ text "+" ]
-            :: [ p [] [] ]
+        tr []
+            [ td [] [ text format ]
+            , td [ class "number" ] [ text <| toString quantity ]
+            , td [ class "number" ] [ text <| toString capacity ]
+            , td [ class "number" ] [ text <| toString total ]
+            , td [] [ button [ onClick (Add format -1) ] [ text "-1" ] ]
+            , td [] [ button [ onClick (Add format 1) ] [ text "+1" ] ]
+            ]
 
 
 viewFormatDetailsAndButtons : Model -> List (Html Msg)
 viewFormatDetailsAndButtons model =
     Dict.toList model
-        |> List.map formatDataToHtml
-        |> List.concat
+        |> List.map viewFormatDataToTableRow
 
 
 view : Model -> Html Msg
 view model =
-    div [] (viewFormatDetailsAndButtons model)
+    table [] (viewTableHeader model :: viewFormatDetailsAndButtons model)
 
 
 updateModel : Model -> Format -> Quantity -> Model
@@ -93,7 +92,7 @@ updateModel model format delta =
     let
         newFormatData =
             Dict.get format model
-                |> Maybe.map (\t -> Tuple.mapFirst ((+) delta) t)
+                |> Maybe.map (Tuple.mapFirst ((+) delta))
                 |> Maybe.withDefault ( 0, 0 )
     in
         Dict.insert format newFormatData model
