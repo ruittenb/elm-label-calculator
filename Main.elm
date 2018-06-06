@@ -35,14 +35,28 @@ type Msg
 model : Model
 model =
     Dict.fromList
-        [ ( "Avery", ( 0, 16 ) )
+        [ ( "Herma", ( 0, 16 ) )
+        , ( "Avery", ( 0, 16 ) )
         , ( "OfficeDepot", ( 0, 24 ) )
+        , ( "Supermagnete", ( 0, 20 ) )
         ]
 
 
 init : ( Model, Cmd msg )
 init =
     ( model, Cmd.none )
+
+
+addNatural : Int -> Int -> Int
+addNatural a b =
+    let
+        total =
+            a + b
+    in
+        if total < 0 then
+            0
+        else
+            total
 
 
 viewTableHeader : Model -> Html Msg
@@ -130,7 +144,7 @@ updateModel model format delta =
     let
         newFormatData =
             Dict.get format model
-                |> Maybe.map (Tuple.mapFirst ((+) delta))
+                |> Maybe.map (Tuple.mapFirst (addNatural delta))
                 |> Maybe.withDefault ( 0, 0 )
     in
         Dict.insert format newFormatData model

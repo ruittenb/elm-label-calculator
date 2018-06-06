@@ -8260,36 +8260,13 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Main$updateModel = F3(
-	function (model, format, delta) {
-		var newFormatData = A2(
-			_elm_lang$core$Maybe$withDefault,
-			{ctor: '_Tuple2', _0: 0, _1: 0},
-			A2(
-				_elm_lang$core$Maybe$map,
-				_elm_lang$core$Tuple$mapFirst(
-					F2(
-						function (x, y) {
-							return x + y;
-						})(delta)),
-				A2(_elm_lang$core$Dict$get, format, model)));
-		return A3(_elm_lang$core$Dict$insert, format, newFormatData, model);
-	});
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var newModel = function () {
-			var _p0 = msg;
-			return A3(_user$project$Main$updateModel, model, _p0._0, _p0._1);
-		}();
-		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
-	});
 var _user$project$Main$viewTableFooter = function (model) {
 	var labels = A3(
 		_elm_lang$core$List$foldl,
 		F2(
-			function (_p1, accumulator) {
-				var _p2 = _p1;
-				return accumulator + (_p2._0 * _p2._1);
+			function (_p0, accumulator) {
+				var _p1 = _p0;
+				return accumulator + (_p1._0 * _p1._1);
 			}),
 		0,
 		A2(
@@ -8433,22 +8410,63 @@ var _user$project$Main$viewTableHeader = function (model) {
 			}
 		});
 };
+var _user$project$Main$addNatural = F2(
+	function (a, b) {
+		var total = a + b;
+		return (_elm_lang$core$Native_Utils.cmp(total, 0) < 0) ? 0 : total;
+	});
+var _user$project$Main$updateModel = F3(
+	function (model, format, delta) {
+		var newFormatData = A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '_Tuple2', _0: 0, _1: 0},
+			A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$core$Tuple$mapFirst(
+					_user$project$Main$addNatural(delta)),
+				A2(_elm_lang$core$Dict$get, format, model)));
+		return A3(_elm_lang$core$Dict$insert, format, newFormatData, model);
+	});
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var newModel = function () {
+			var _p2 = msg;
+			return A3(_user$project$Main$updateModel, model, _p2._0, _p2._1);
+		}();
+		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
+	});
 var _user$project$Main$model = _elm_lang$core$Dict$fromList(
 	{
 		ctor: '::',
 		_0: {
 			ctor: '_Tuple2',
-			_0: 'Avery',
+			_0: 'Herma',
 			_1: {ctor: '_Tuple2', _0: 0, _1: 16}
 		},
 		_1: {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'OfficeDepot',
-				_1: {ctor: '_Tuple2', _0: 0, _1: 24}
+				_0: 'Avery',
+				_1: {ctor: '_Tuple2', _0: 0, _1: 16}
 			},
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'OfficeDepot',
+					_1: {ctor: '_Tuple2', _0: 0, _1: 24}
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'Supermagnete',
+						_1: {ctor: '_Tuple2', _0: 0, _1: 20}
+					},
+					_1: {ctor: '[]'}
+				}
+			}
 		}
 	});
 var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$model, _1: _elm_lang$core$Platform_Cmd$none};
