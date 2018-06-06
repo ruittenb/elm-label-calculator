@@ -8283,6 +8283,102 @@ var _user$project$Main$update = F2(
 		}();
 		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
 	});
+var _user$project$Main$viewTableFooter = function (model) {
+	var labels = A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (_p1, accumulator) {
+				var _p2 = _p1;
+				return accumulator + (_p2._0 * _p2._1);
+			}),
+		0,
+		A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$second,
+			_elm_lang$core$Dict$toList(model)));
+	var quantity = A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (x, y) {
+				return x + y;
+			}),
+		0,
+		A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$first,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$second,
+				_elm_lang$core$Dict$toList(model))));
+	return A2(
+		_elm_lang$html$Html$tr,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('footer'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('number quantity'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_elm_lang$core$Basics$toString(quantity)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$td,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('number'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											_elm_lang$core$Basics$toString(labels)),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		});
+};
 var _user$project$Main$viewTableHeader = function (model) {
 	return A2(
 		_elm_lang$html$Html$tr,
@@ -8301,7 +8397,11 @@ var _user$project$Main$viewTableHeader = function (model) {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$th,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$colspan(3),
+						_1: {ctor: '[]'}
+					},
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text('aantal vel'),
@@ -8327,21 +8427,7 @@ var _user$project$Main$viewTableHeader = function (model) {
 								_0: _elm_lang$html$Html$text('totaal # labels'),
 								_1: {ctor: '[]'}
 							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$th,
-								{ctor: '[]'},
-								{ctor: '[]'}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$th,
-									{ctor: '[]'},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}
-						}
+						_1: {ctor: '[]'}
 					}
 				}
 			}
@@ -8370,13 +8456,13 @@ var _user$project$Main$Add = F2(
 	function (a, b) {
 		return {ctor: 'Add', _0: a, _1: b};
 	});
-var _user$project$Main$viewFormatDataToTableRow = function (_p1) {
-	var _p2 = _p1;
-	var _p4 = _p2._0;
-	var _p3 = _p2._1;
-	var quantity = _p3._0;
-	var capacity = _p3._1;
-	var total = quantity * capacity;
+var _user$project$Main$viewFormatDataToTableRow = function (_p3) {
+	var _p4 = _p3;
+	var _p6 = _p4._0;
+	var _p5 = _p4._1;
+	var quantity = _p5._0;
+	var capacity = _p5._1;
+	var labels = quantity * capacity;
 	return A2(
 		_elm_lang$html$Html$tr,
 		{ctor: '[]'},
@@ -8387,23 +8473,46 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p1) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p4),
+					_0: _elm_lang$html$Html$text(_p6),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$td,
+					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('number'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							_elm_lang$core$Basics$toString(quantity)),
-						_1: {ctor: '[]'}
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(
+									A2(_user$project$Main$Add, _p6, -10)),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('-10'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(
+										A2(_user$project$Main$Add, _p6, -1)),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('-1'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}),
 				_1: {
 					ctor: '::',
@@ -8411,72 +8520,81 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p1) {
 						_elm_lang$html$Html$td,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('number'),
+							_0: _elm_lang$html$Html_Attributes$class('number quantity'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Basics$toString(capacity)),
+								_elm_lang$core$Basics$toString(quantity)),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$td,
+							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('number'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(total)),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$td,
-								{ctor: '[]'},
-								{
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											A2(_user$project$Main$Add, _p6, 1)),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('+1'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$button,
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onClick(
-												A2(_user$project$Main$Add, _p4, -1)),
+												A2(_user$project$Main$Add, _p6, 10)),
 											_1: {ctor: '[]'}
 										},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('-1'),
+											_0: _elm_lang$html$Html$text('+10'),
 											_1: {ctor: '[]'}
 										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('number'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										_elm_lang$core$Basics$toString(capacity)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$td,
-									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(
-													A2(_user$project$Main$Add, _p4, 1)),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('+1'),
-												_1: {ctor: '[]'}
-											}),
+										_0: _elm_lang$html$Html_Attributes$class('number'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											_elm_lang$core$Basics$toString(labels)),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -8497,18 +8615,28 @@ var _user$project$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$table,
 		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _user$project$Main$viewTableHeader(model),
-			_1: _user$project$Main$viewFormatDetailsAndButtons(model)
-		});
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _user$project$Main$viewTableHeader(model),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_user$project$Main$viewFormatDetailsAndButtons(model),
+				{
+					ctor: '::',
+					_0: _user$project$Main$viewTableFooter(model),
+					_1: {ctor: '[]'}
+				})));
 };
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
 		init: _user$project$Main$init,
 		update: _user$project$Main$update,
 		view: _user$project$Main$view,
-		subscriptions: function (_p5) {
+		subscriptions: function (_p7) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

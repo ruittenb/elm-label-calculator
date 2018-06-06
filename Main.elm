@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Html exposing (Html, table, tr, th, td, button, div, span, text, p)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, colspan)
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Tuple
@@ -49,12 +49,41 @@ viewTableHeader : Model -> Html Msg
 viewTableHeader model =
     tr []
         [ th [] [ text "labelsoort" ]
-        , th [] [ text "aantal vel" ]
+        , th [ colspan 3 ] [ text "aantal vel" ]
         , th [] [ text "labels per vel" ]
         , th [] [ text "totaal # labels" ]
-        , th [] []
-        , th [] []
         ]
+
+
+viewTableFooter : Model -> Html Msg
+viewTableFooter model =
+    let
+        quantity =
+            Dict.toList model
+                -- keep FormatData
+                |> List.map Tuple.second
+                -- keep Quantity
+                |> List.map Tuple.first
+                -- foldl : (a -> b -> b) -> b -> List a -> b
+                |> List.foldl (+) 0
+
+        labels =
+            Dict.toList model
+                -- keep FormatData
+                |> List.map Tuple.second
+                -- foldl : (a -> b -> b) -> b -> List a -> b
+                |> List.foldl
+                    (\( quantity, capacity ) accumulator -> accumulator + quantity * capacity)
+                    0
+    in
+        tr [ class "footer" ]
+            [ td [] []
+            , td [] []
+            , td [ class "number quantity" ] [ text <| toString quantity ]
+            , td [] []
+            , td [] []
+            , td [ class "number" ] [ text <| toString labels ]
+            ]
 
 
 viewFormatDataToTableRow : ( Format, FormatData ) -> Html Msg
@@ -63,16 +92,22 @@ viewFormatDataToTableRow ( format, formatData ) =
         ( quantity, capacity ) =
             formatData
 
-        total =
+        labels =
             quantity * capacity
     in
         tr []
             [ td [] [ text format ]
-            , td [ class "number" ] [ text <| toString quantity ]
+            , td []
+                [ button [ onClick (Add format -10) ] [ text "-10" ]
+                , button [ onClick (Add format -1) ] [ text "-1" ]
+                ]
+            , td [ class "number quantity" ] [ text <| toString quantity ]
+            , td []
+                [ button [ onClick (Add format 1) ] [ text "+1" ]
+                , button [ onClick (Add format 10) ] [ text "+10" ]
+                ]
             , td [ class "number" ] [ text <| toString capacity ]
-            , td [ class "number" ] [ text <| toString total ]
-            , td [] [ button [ onClick (Add format -1) ] [ text "-1" ] ]
-            , td [] [ button [ onClick (Add format 1) ] [ text "+1" ] ]
+            , td [ class "number" ] [ text <| toString labels ]
             ]
 
 
@@ -84,7 +119,10 @@ viewFormatDetailsAndButtons model =
 
 view : Model -> Html Msg
 view model =
-    table [] (viewTableHeader model :: viewFormatDetailsAndButtons model)
+    table [] <|
+        [ viewTableHeader model ]
+            ++ viewFormatDetailsAndButtons model
+            ++ [ viewTableFooter model ]
 
 
 updateModel : Model -> Format -> Quantity -> Model
