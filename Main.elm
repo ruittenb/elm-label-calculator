@@ -1,9 +1,10 @@
 module Main exposing (main)
 
-import Html exposing (Html, table, tr, th, td, button, input, div, span, text, p)
+import Html exposing (Html, Attribute, table, tr, th, td, button, input, text)
 import Html.Attributes exposing (class, colspan, type_, checked)
-import Html.Events exposing (onClick, onCheck)
+import Html.Events exposing (onClick, onCheck, onWithOptions)
 import Dict exposing (Dict)
+import Json.Decode as Json
 import Tuple
 import List
 
@@ -37,7 +38,7 @@ type alias Model =
 
 type Msg
     = Add Format Quantity
-    | CheckboxToggled Format Selected
+    | CheckboxToggled Format
 
 
 addNatural : Int -> Int -> Int
@@ -66,6 +67,17 @@ model =
 init : ( Model, Cmd msg )
 init =
     ( model, Cmd.none )
+
+
+onClickPreventDefault : msg -> Attribute msg
+onClickPreventDefault message =
+    let
+        config =
+            { stopPropagation = False
+            , preventDefault = True
+            }
+    in
+        onWithOptions "click" config (Json.succeed message)
 
 
 viewTableHeader : Model -> Html Msg
@@ -119,7 +131,7 @@ viewFormatDataToTableRow ( format, formatData ) =
             [ td []
                 [ input
                     [ type_ "checkbox"
-                    , onCheck (CheckboxToggled format)
+                    , onClickPreventDefault (CheckboxToggled format)
                     , checked formatData.selected
                     ]
                     []
@@ -153,6 +165,19 @@ view model =
             ++ [ viewTableFooter model ]
 
 
+getTotalNumberSelected : Model -> Int
+getTotalNumberSelected model =
+    Dict.values model
+        |> List.foldl
+            (\formatData accumulator ->
+                if formatData.selected then
+                    accumulator + 1
+                else
+                    accumulator
+            )
+            0
+
+
 updateModelQuantity : Model -> Format -> Quantity -> Model
 updateModelQuantity model format delta =
     let
@@ -164,12 +189,20 @@ updateModelQuantity model format delta =
         Dict.insert format newFormatData model
 
 
-updateModelSelected : Model -> Format -> Selected -> Model
-updateModelSelected model format checked =
+updateModelSelected : Model -> Format -> Model
+updateModelSelected model format =
     let
+        totalNrSelected =
+            getTotalNumberSelected model
+
         newFormatData =
             Dict.get format model
-                |> Maybe.map (\formatData -> { formatData | selected = checked })
+                |> Maybe.map
+                    (\formatData ->
+                        { formatData
+                            | selected = not formatData.selected && totalNrSelected < 2
+                        }
+                    )
                 |> Maybe.withDefault { quantity = 0, capacity = 0, selected = False }
     in
         Dict.insert format newFormatData model
@@ -183,8 +216,8 @@ update msg model =
                 Add format num ->
                     updateModelQuantity model format num
 
-                CheckboxToggled format checked ->
-                    updateModelSelected model format checked
+                CheckboxToggled format ->
+                    updateModelSelected model format
     in
         ( newModel, Cmd.none )
 

@@ -8260,8 +8260,19 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Main$updateModelSelected = F3(
-	function (model, format, checked) {
+var _user$project$Main$getTotalNumberSelected = function (model) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (formatData, accumulator) {
+				return formatData.selected ? (accumulator + 1) : accumulator;
+			}),
+		0,
+		_elm_lang$core$Dict$values(model));
+};
+var _user$project$Main$updateModelSelected = F2(
+	function (model, format) {
+		var totalNrSelected = _user$project$Main$getTotalNumberSelected(model);
 		var newFormatData = A2(
 			_elm_lang$core$Maybe$withDefault,
 			{quantity: 0, capacity: 0, selected: false},
@@ -8270,7 +8281,9 @@ var _user$project$Main$updateModelSelected = F3(
 				function (formatData) {
 					return _elm_lang$core$Native_Utils.update(
 						formatData,
-						{selected: false});
+						{
+							selected: (!formatData.selected) && (_elm_lang$core$Native_Utils.cmp(totalNrSelected, 2) < 0)
+						});
 				},
 				A2(_elm_lang$core$Dict$get, format, model)));
 		return A3(_elm_lang$core$Dict$insert, format, newFormatData, model);
@@ -8444,6 +8457,14 @@ var _user$project$Main$viewTableHeader = function (model) {
 			}
 		});
 };
+var _user$project$Main$onClickPreventDefault = function (message) {
+	var config = {stopPropagation: false, preventDefault: true};
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'click',
+		config,
+		_elm_lang$core$Json_Decode$succeed(message));
+};
 var _user$project$Main$model = _elm_lang$core$Dict$fromList(
 	{
 		ctor: '::',
@@ -8508,7 +8529,7 @@ var _user$project$Main$update = F2(
 			if (_p1.ctor === 'Add') {
 				return A3(_user$project$Main$updateModelQuantity, model, _p1._0, _p1._1);
 			} else {
-				return A3(_user$project$Main$updateModelSelected, model, _p1._0, _p1._1);
+				return A2(_user$project$Main$updateModelSelected, model, _p1._0);
 			}
 		}();
 		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
@@ -8517,10 +8538,9 @@ var _user$project$Main$FormatData = F3(
 	function (a, b, c) {
 		return {quantity: a, capacity: b, selected: c};
 	});
-var _user$project$Main$CheckboxToggled = F2(
-	function (a, b) {
-		return {ctor: 'CheckboxToggled', _0: a, _1: b};
-	});
+var _user$project$Main$CheckboxToggled = function (a) {
+	return {ctor: 'CheckboxToggled', _0: a};
+};
 var _user$project$Main$Add = F2(
 	function (a, b) {
 		return {ctor: 'Add', _0: a, _1: b};
@@ -8547,7 +8567,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onCheck(
+								_0: _user$project$Main$onClickPreventDefault(
 									_user$project$Main$CheckboxToggled(_p4)),
 								_1: {
 									ctor: '::',
