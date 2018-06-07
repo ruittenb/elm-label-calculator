@@ -32,6 +32,19 @@ type Msg
     = Add Format Quantity
 
 
+addNatural : Int -> Int -> Int
+addNatural a b =
+    -- add natural numbers, i.e. not below zero.
+    let
+        total =
+            a + b
+    in
+        if total < 0 then
+            0
+        else
+            total
+
+
 model : Model
 model =
     Dict.fromList
@@ -45,18 +58,6 @@ model =
 init : ( Model, Cmd msg )
 init =
     ( model, Cmd.none )
-
-
-addNatural : Int -> Int -> Int
-addNatural a b =
-    let
-        total =
-            a + b
-    in
-        if total < 0 then
-            0
-        else
-            total
 
 
 viewTableHeader : Model -> Html Msg
