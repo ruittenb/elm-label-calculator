@@ -1,11 +1,10 @@
 module Main exposing (..)
 
 import Html exposing (Html, Attribute, table, tr, th, td, button, input, text)
-import Html.Attributes exposing (class, colspan, type_, checked, readonly, disabled)
-import Html.Events exposing (onClick, onCheck, onWithOptions)
+import Html.Attributes exposing (class, colspan, type_, checked)
+import Html.Events exposing (onClick, onWithOptions)
 import Dict exposing (Dict)
 import Json.Decode as Json
-import Tuple
 import List
 
 
@@ -17,7 +16,7 @@ type alias Capacity =
     Int
 
 
-type alias Format =
+type alias LabelType =
     String
 
 
@@ -25,20 +24,26 @@ type alias Selected =
     Bool
 
 
-type alias FormatData =
-    { quantity : Quantity
+type alias LabelData =
+    { labelType : LabelType
+    , quantity : Quantity
     , capacity : Capacity
     , selected : Selected
     }
 
 
 type alias Model =
-    Dict Format FormatData
+    List LabelData
 
 
 type Msg
-    = Add Format Quantity
-    | CheckboxToggled Format
+    = Add LabelData Quantity
+    | CheckboxToggled LabelData
+
+
+target : Quantity
+target =
+    4928
 
 
 addNatural : Int -> Int -> Int
@@ -67,26 +72,24 @@ onClickPreventDefault message =
 
 getTotalNumberSelected : Model -> Int
 getTotalNumberSelected model =
-    Dict.values model
-        |> List.foldl
-            (\formatData accumulator ->
-                if formatData.selected then
-                    accumulator + 1
-                else
-                    accumulator
-            )
-            -- accumulator:
-            0
+    List.foldl
+        (\labelData accumulator ->
+            if labelData.selected then
+                accumulator + 1
+            else
+                accumulator
+        )
+        0
+        model
 
 
 model : Model
 model =
-    Dict.fromList
-        [ ( "Herma", { quantity = 0, capacity = 16, selected = False } )
-        , ( "Avery", { quantity = 0, capacity = 16, selected = True } )
-        , ( "OfficeDepot", { quantity = 0, capacity = 24, selected = True } )
-        , ( "Supermagnete", { quantity = 0, capacity = 20, selected = False } )
-        ]
+    [ { quantity = 0, capacity = 16, selected = False, labelType = "Herma" }
+    , { quantity = 0, capacity = 16, selected = True, labelType = "Avery" }
+    , { quantity = 0, capacity = 24, selected = True, labelType = "OfficeDepot" }
+    , { quantity = 0, capacity = 20, selected = False, labelType = "Supermagnete" }
+    ]
 
 
 init : ( Model, Cmd msg )
@@ -94,8 +97,8 @@ init =
     ( model, Cmd.none )
 
 
-viewTableHeader : Model -> Html Msg
-viewTableHeader model =
+viewTableHeader : Html Msg
+viewTableHeader =
     tr []
         [ th [] [ text "sel" ]
         , th [] [ text "labelsoort" ]
@@ -108,102 +111,93 @@ viewTableHeader model =
 viewTableFooter : Model -> Html Msg
 viewTableFooter model =
     let
-        quantity =
-            Dict.toList model
-                -- keep FormatData, then Quantity
-                |> List.map (Tuple.second >> .quantity)
+        totalQuantity =
+            List.map .quantity model
                 -- foldl : (a -> b -> b) -> b -> List a -> b
                 |> List.foldl (+) 0
 
         totalLabels =
-            Dict.toList model
-                -- keep FormatData
-                |> List.map Tuple.second
+            List.map (\labelData -> labelData.quantity * labelData.capacity) model
                 -- foldl : (a -> b -> b) -> b -> List a -> b
-                |> List.foldl
-                    (\formatData accumulator -> accumulator + formatData.quantity * formatData.capacity)
-                    0
+                |> List.foldl (+) 0
     in
         tr [ class "footer" ]
             [ td [ class "transparent centered" ] [ text <| toString (getTotalNumberSelected model) ]
             , td [] []
             , td [] []
-            , td [ class "number quantity" ] [ text <| toString quantity ]
+            , td [ class "number quantity" ] [ text <| toString totalQuantity ]
             , td [] []
             , td [] []
             , td [ class "number" ] [ text <| toString totalLabels ]
             ]
 
 
-viewFormatDataToTableRow : ( Format, FormatData ) -> Html Msg
-viewFormatDataToTableRow ( format, formatData ) =
+viewTableRow : LabelData -> Html Msg
+viewTableRow labelData =
     tr []
         [ td [ class "centered" ] <|
             [ input
                 ([ type_ "checkbox"
-                 , onClickPreventDefault (CheckboxToggled format)
-                 , checked formatData.selected
+                 , onClickPreventDefault (CheckboxToggled labelData)
+                 , checked labelData.selected
                  ]
                 )
                 []
             ]
-        , td [] [ text format ]
+        , td [] [ text labelData.labelType ]
         , td []
-            [ button [ onClick (Add format -10) ] [ text "-10" ]
-            , button [ onClick (Add format -1) ] [ text "-1" ]
+            [ button [ onClick (Add labelData -10) ] [ text "-10" ]
+            , button [ onClick (Add labelData -1) ] [ text "-1" ]
             ]
-        , td [ class "number quantity" ] [ text <| toString formatData.quantity ]
+        , td [ class "number quantity" ] [ text <| toString labelData.quantity ]
         , td []
-            [ button [ onClick (Add format 1) ] [ text "+1" ]
-            , button [ onClick (Add format 10) ] [ text "+10" ]
+            [ button [ onClick (Add labelData 1) ] [ text "+1" ]
+            , button [ onClick (Add labelData 10) ] [ text "+10" ]
             ]
-        , td [ class "number" ] [ text <| toString formatData.capacity ]
-        , td [ class "number" ] [ text <| toString <| formatData.quantity * formatData.capacity ]
+        , td [ class "number" ] [ text <| toString labelData.capacity ]
+        , td [ class "number" ] [ text <| toString <| labelData.quantity * labelData.capacity ]
         ]
 
 
-viewFormatDetailsAndButtons : Model -> List (Html Msg)
-viewFormatDetailsAndButtons model =
-    Dict.toList model
-        |> List.map viewFormatDataToTableRow
+viewTableRows : Model -> List (Html Msg)
+viewTableRows model =
+    List.map viewTableRow model
 
 
 view : Model -> Html Msg
 view model =
     table [] <|
-        [ viewTableHeader model ]
-            ++ viewFormatDetailsAndButtons model
+        [ viewTableHeader ]
+            ++ viewTableRows model
             ++ [ viewTableFooter model ]
 
 
-updateModelQuantity : Model -> Format -> Quantity -> Model
-updateModelQuantity model format delta =
-    let
-        newFormatData =
-            Dict.get format model
-                |> Maybe.map (\formatData -> { formatData | quantity = addNatural delta formatData.quantity })
-                |> Maybe.withDefault { quantity = 0, capacity = 0, selected = False }
-    in
-        Dict.insert format newFormatData model
+updateModelQuantity : Model -> LabelData -> Quantity -> Model
+updateModelQuantity model labelData delta =
+    List.map
+        (\record ->
+            if labelData.labelType == record.labelType then
+                { record | quantity = addNatural delta record.quantity }
+            else
+                record
+        )
+        model
 
 
-updateModelSelected : Model -> Format -> Model
-updateModelSelected model format =
+updateModelSelected : Model -> LabelData -> Model
+updateModelSelected model labelData =
     let
         totalNrSelected =
             getTotalNumberSelected model
-
-        newFormatData =
-            Dict.get format model
-                |> Maybe.map
-                    (\formatData ->
-                        { formatData
-                            | selected = not formatData.selected && totalNrSelected < 2
-                        }
-                    )
-                |> Maybe.withDefault { quantity = 0, capacity = 0, selected = False }
     in
-        Dict.insert format newFormatData model
+        List.map
+            (\record ->
+                if labelData.labelType == record.labelType then
+                    { record | selected = not record.selected && totalNrSelected < 2 }
+                else
+                    record
+            )
+            model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -211,11 +205,11 @@ update msg model =
     let
         newModel =
             case msg of
-                Add format num ->
-                    updateModelQuantity model format num
+                Add labelData num ->
+                    updateModelQuantity model labelData num
 
-                CheckboxToggled format ->
-                    updateModelSelected model format
+                CheckboxToggled labelData ->
+                    updateModelSelected model labelData
     in
         ( newModel, Cmd.none )
 

@@ -8260,42 +8260,51 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Main$viewTableHeader = function (model) {
-	return A2(
-		_elm_lang$html$Html$tr,
-		{ctor: '[]'},
-		{
+var _user$project$Main$viewTableHeader = A2(
+	_elm_lang$html$Html$tr,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$th,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('sel'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$th,
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('sel'),
+					_0: _elm_lang$html$Html$text('labelsoort'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$th,
-					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('labelsoort'),
+						_0: _elm_lang$html$Html_Attributes$colspan(3),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('aantal vel'),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$th,
+						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$colspan(3),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('aantal vel'),
+							_0: _elm_lang$html$Html$text('labels per vel'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -8305,84 +8314,45 @@ var _user$project$Main$viewTableHeader = function (model) {
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('labels per vel'),
+								_0: _elm_lang$html$Html$text('totaal # labels'),
 								_1: {ctor: '[]'}
 							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$th,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('totaal # labels'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_1: {ctor: '[]'}
 					}
-				}
-			}
-		});
-};
-var _user$project$Main$model = _elm_lang$core$Dict$fromList(
-	{
-		ctor: '::',
-		_0: {
-			ctor: '_Tuple2',
-			_0: 'Herma',
-			_1: {quantity: 0, capacity: 16, selected: false}
-		},
-		_1: {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'Avery',
-				_1: {quantity: 0, capacity: 16, selected: true}
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'OfficeDepot',
-					_1: {quantity: 0, capacity: 24, selected: true}
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'Supermagnete',
-						_1: {quantity: 0, capacity: 20, selected: false}
-					},
-					_1: {ctor: '[]'}
 				}
 			}
 		}
 	});
+var _user$project$Main$model = {
+	ctor: '::',
+	_0: {quantity: 0, capacity: 16, selected: false, labelType: 'Herma'},
+	_1: {
+		ctor: '::',
+		_0: {quantity: 0, capacity: 16, selected: true, labelType: 'Avery'},
+		_1: {
+			ctor: '::',
+			_0: {quantity: 0, capacity: 24, selected: true, labelType: 'OfficeDepot'},
+			_1: {
+				ctor: '::',
+				_0: {quantity: 0, capacity: 20, selected: false, labelType: 'Supermagnete'},
+				_1: {ctor: '[]'}
+			}
+		}
+	}
+};
 var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$model, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$Main$getTotalNumberSelected = function (model) {
 	return A3(
 		_elm_lang$core$List$foldl,
 		F2(
-			function (formatData, accumulator) {
-				return formatData.selected ? (accumulator + 1) : accumulator;
+			function (labelData, accumulator) {
+				return labelData.selected ? (accumulator + 1) : accumulator;
 			}),
 		0,
-		_elm_lang$core$Dict$values(model));
+		model);
 };
 var _user$project$Main$viewTableFooter = function (model) {
 	var totalLabels = A3(
-		_elm_lang$core$List$foldl,
-		F2(
-			function (formatData, accumulator) {
-				return accumulator + (formatData.quantity * formatData.capacity);
-			}),
-		0,
-		A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$second,
-			_elm_lang$core$Dict$toList(model)));
-	var quantity = A3(
 		_elm_lang$core$List$foldl,
 		F2(
 			function (x, y) {
@@ -8391,13 +8361,23 @@ var _user$project$Main$viewTableFooter = function (model) {
 		0,
 		A2(
 			_elm_lang$core$List$map,
-			function (_p0) {
-				return function (_) {
-					return _.quantity;
-				}(
-					_elm_lang$core$Tuple$second(_p0));
+			function (labelData) {
+				return labelData.quantity * labelData.capacity;
 			},
-			_elm_lang$core$Dict$toList(model)));
+			model));
+	var totalQuantity = A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (x, y) {
+				return x + y;
+			}),
+		0,
+		A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.quantity;
+			},
+			model));
 	return A2(
 		_elm_lang$html$Html$tr,
 		{
@@ -8445,7 +8425,7 @@ var _user$project$Main$viewTableFooter = function (model) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(quantity)),
+									_elm_lang$core$Basics$toString(totalQuantity)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -8485,22 +8465,18 @@ var _user$project$Main$viewTableFooter = function (model) {
 		});
 };
 var _user$project$Main$updateModelSelected = F2(
-	function (model, format) {
+	function (model, labelData) {
 		var totalNrSelected = _user$project$Main$getTotalNumberSelected(model);
-		var newFormatData = A2(
-			_elm_lang$core$Maybe$withDefault,
-			{quantity: 0, capacity: 0, selected: false},
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (formatData) {
-					return _elm_lang$core$Native_Utils.update(
-						formatData,
-						{
-							selected: (!formatData.selected) && (_elm_lang$core$Native_Utils.cmp(totalNrSelected, 2) < 0)
-						});
-				},
-				A2(_elm_lang$core$Dict$get, format, model)));
-		return A3(_elm_lang$core$Dict$insert, format, newFormatData, model);
+		return A2(
+			_elm_lang$core$List$map,
+			function (record) {
+				return _elm_lang$core$Native_Utils.eq(labelData.labelType, record.labelType) ? _elm_lang$core$Native_Utils.update(
+					record,
+					{
+						selected: (!record.selected) && (_elm_lang$core$Native_Utils.cmp(totalNrSelected, 2) < 0)
+					}) : record;
+			},
+			model);
 	});
 var _user$project$Main$onClickPreventDefault = function (message) {
 	var config = {stopPropagation: false, preventDefault: true};
@@ -8516,37 +8492,34 @@ var _user$project$Main$addNatural = F2(
 		return (_elm_lang$core$Native_Utils.cmp(total, 0) < 0) ? 0 : total;
 	});
 var _user$project$Main$updateModelQuantity = F3(
-	function (model, format, delta) {
-		var newFormatData = A2(
-			_elm_lang$core$Maybe$withDefault,
-			{quantity: 0, capacity: 0, selected: false},
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (formatData) {
-					return _elm_lang$core$Native_Utils.update(
-						formatData,
-						{
-							quantity: A2(_user$project$Main$addNatural, delta, formatData.quantity)
-						});
-				},
-				A2(_elm_lang$core$Dict$get, format, model)));
-		return A3(_elm_lang$core$Dict$insert, format, newFormatData, model);
+	function (model, labelData, delta) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (record) {
+				return _elm_lang$core$Native_Utils.eq(labelData.labelType, record.labelType) ? _elm_lang$core$Native_Utils.update(
+					record,
+					{
+						quantity: A2(_user$project$Main$addNatural, delta, record.quantity)
+					}) : record;
+			},
+			model);
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
 		var newModel = function () {
-			var _p1 = msg;
-			if (_p1.ctor === 'Add') {
-				return A3(_user$project$Main$updateModelQuantity, model, _p1._0, _p1._1);
+			var _p0 = msg;
+			if (_p0.ctor === 'Add') {
+				return A3(_user$project$Main$updateModelQuantity, model, _p0._0, _p0._1);
 			} else {
-				return A2(_user$project$Main$updateModelSelected, model, _p1._0);
+				return A2(_user$project$Main$updateModelSelected, model, _p0._0);
 			}
 		}();
 		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
 	});
-var _user$project$Main$FormatData = F3(
-	function (a, b, c) {
-		return {quantity: a, capacity: b, selected: c};
+var _user$project$Main$target = 4928;
+var _user$project$Main$LabelData = F4(
+	function (a, b, c, d) {
+		return {labelType: a, quantity: b, capacity: c, selected: d};
 	});
 var _user$project$Main$CheckboxToggled = function (a) {
 	return {ctor: 'CheckboxToggled', _0: a};
@@ -8555,10 +8528,7 @@ var _user$project$Main$Add = F2(
 	function (a, b) {
 		return {ctor: 'Add', _0: a, _1: b};
 	});
-var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
-	var _p3 = _p2;
-	var _p5 = _p3._1;
-	var _p4 = _p3._0;
+var _user$project$Main$viewTableRow = function (labelData) {
 	return A2(
 		_elm_lang$html$Html$tr,
 		{ctor: '[]'},
@@ -8581,10 +8551,10 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 							_1: {
 								ctor: '::',
 								_0: _user$project$Main$onClickPreventDefault(
-									_user$project$Main$CheckboxToggled(_p4)),
+									_user$project$Main$CheckboxToggled(labelData)),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$checked(_p5.selected),
+									_0: _elm_lang$html$Html_Attributes$checked(labelData.selected),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -8599,7 +8569,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(_p4),
+						_0: _elm_lang$html$Html$text(labelData.labelType),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -8614,7 +8584,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(
-										A2(_user$project$Main$Add, _p4, -10)),
+										A2(_user$project$Main$Add, labelData, -10)),
 									_1: {ctor: '[]'}
 								},
 								{
@@ -8629,7 +8599,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onClick(
-											A2(_user$project$Main$Add, _p4, -1)),
+											A2(_user$project$Main$Add, labelData, -1)),
 										_1: {ctor: '[]'}
 									},
 									{
@@ -8652,7 +8622,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(_p5.quantity)),
+									_elm_lang$core$Basics$toString(labelData.quantity)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -8667,7 +8637,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onClick(
-												A2(_user$project$Main$Add, _p4, 1)),
+												A2(_user$project$Main$Add, labelData, 1)),
 											_1: {ctor: '[]'}
 										},
 										{
@@ -8682,7 +8652,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 											{
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(
-													A2(_user$project$Main$Add, _p4, 10)),
+													A2(_user$project$Main$Add, labelData, 10)),
 												_1: {ctor: '[]'}
 											},
 											{
@@ -8705,7 +8675,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html$text(
-											_elm_lang$core$Basics$toString(_p5.capacity)),
+											_elm_lang$core$Basics$toString(labelData.capacity)),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
@@ -8720,7 +8690,7 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html$text(
-												_elm_lang$core$Basics$toString(_p5.quantity * _p5.capacity)),
+												_elm_lang$core$Basics$toString(labelData.quantity * labelData.capacity)),
 											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
@@ -8732,11 +8702,8 @@ var _user$project$Main$viewFormatDataToTableRow = function (_p2) {
 			}
 		});
 };
-var _user$project$Main$viewFormatDetailsAndButtons = function (model) {
-	return A2(
-		_elm_lang$core$List$map,
-		_user$project$Main$viewFormatDataToTableRow,
-		_elm_lang$core$Dict$toList(model));
+var _user$project$Main$viewTableRows = function (model) {
+	return A2(_elm_lang$core$List$map, _user$project$Main$viewTableRow, model);
 };
 var _user$project$Main$view = function (model) {
 	return A2(
@@ -8746,12 +8713,12 @@ var _user$project$Main$view = function (model) {
 			_elm_lang$core$Basics_ops['++'],
 			{
 				ctor: '::',
-				_0: _user$project$Main$viewTableHeader(model),
+				_0: _user$project$Main$viewTableHeader,
 				_1: {ctor: '[]'}
 			},
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				_user$project$Main$viewFormatDetailsAndButtons(model),
+				_user$project$Main$viewTableRows(model),
 				{
 					ctor: '::',
 					_0: _user$project$Main$viewTableFooter(model),
@@ -8763,7 +8730,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 		init: _user$project$Main$init,
 		update: _user$project$Main$update,
 		view: _user$project$Main$view,
-		subscriptions: function (_p6) {
+		subscriptions: function (_p1) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
