@@ -1,7 +1,7 @@
-module Main exposing (main)
+module Main exposing (..)
 
 import Html exposing (Html, Attribute, table, tr, th, td, button, input, text)
-import Html.Attributes exposing (class, colspan, type_, checked)
+import Html.Attributes exposing (class, colspan, type_, checked, readonly, disabled)
 import Html.Events exposing (onClick, onCheck, onWithOptions)
 import Dict exposing (Dict)
 import Json.Decode as Json
@@ -54,6 +54,31 @@ addNatural a b =
             total
 
 
+onClickPreventDefault : msg -> Attribute msg
+onClickPreventDefault message =
+    let
+        config =
+            { stopPropagation = False
+            , preventDefault = True
+            }
+    in
+        onWithOptions "click" config (Json.succeed message)
+
+
+getTotalNumberSelected : Model -> Int
+getTotalNumberSelected model =
+    Dict.values model
+        |> List.foldl
+            (\formatData accumulator ->
+                if formatData.selected then
+                    accumulator + 1
+                else
+                    accumulator
+            )
+            -- accumulator:
+            0
+
+
 model : Model
 model =
     Dict.fromList
@@ -67,17 +92,6 @@ model =
 init : ( Model, Cmd msg )
 init =
     ( model, Cmd.none )
-
-
-onClickPreventDefault : msg -> Attribute msg
-onClickPreventDefault message =
-    let
-        config =
-            { stopPropagation = False
-            , preventDefault = True
-            }
-    in
-        onWithOptions "click" config (Json.succeed message)
 
 
 viewTableHeader : Model -> Html Msg
@@ -111,7 +125,7 @@ viewTableFooter model =
                     0
     in
         tr [ class "footer" ]
-            [ td [] []
+            [ td [ class "transparent centered" ] [ text <| toString (getTotalNumberSelected model) ]
             , td [] []
             , td [] []
             , td [ class "number quantity" ] [ text <| toString quantity ]
@@ -123,32 +137,29 @@ viewTableFooter model =
 
 viewFormatDataToTableRow : ( Format, FormatData ) -> Html Msg
 viewFormatDataToTableRow ( format, formatData ) =
-    let
-        totalLabels =
-            formatData.quantity * formatData.capacity
-    in
-        tr []
-            [ td []
-                [ input
-                    [ type_ "checkbox"
-                    , onClickPreventDefault (CheckboxToggled format)
-                    , checked formatData.selected
-                    ]
-                    []
-                ]
-            , td [] [ text format ]
-            , td []
-                [ button [ onClick (Add format -10) ] [ text "-10" ]
-                , button [ onClick (Add format -1) ] [ text "-1" ]
-                ]
-            , td [ class "number quantity" ] [ text <| toString formatData.quantity ]
-            , td []
-                [ button [ onClick (Add format 1) ] [ text "+1" ]
-                , button [ onClick (Add format 10) ] [ text "+10" ]
-                ]
-            , td [ class "number" ] [ text <| toString formatData.capacity ]
-            , td [ class "number" ] [ text <| toString totalLabels ]
+    tr []
+        [ td [ class "centered" ] <|
+            [ input
+                ([ type_ "checkbox"
+                 , onClickPreventDefault (CheckboxToggled format)
+                 , checked formatData.selected
+                 ]
+                )
+                []
             ]
+        , td [] [ text format ]
+        , td []
+            [ button [ onClick (Add format -10) ] [ text "-10" ]
+            , button [ onClick (Add format -1) ] [ text "-1" ]
+            ]
+        , td [ class "number quantity" ] [ text <| toString formatData.quantity ]
+        , td []
+            [ button [ onClick (Add format 1) ] [ text "+1" ]
+            , button [ onClick (Add format 10) ] [ text "+10" ]
+            ]
+        , td [ class "number" ] [ text <| toString formatData.capacity ]
+        , td [ class "number" ] [ text <| toString <| formatData.quantity * formatData.capacity ]
+        ]
 
 
 viewFormatDetailsAndButtons : Model -> List (Html Msg)
@@ -163,19 +174,6 @@ view model =
         [ viewTableHeader model ]
             ++ viewFormatDetailsAndButtons model
             ++ [ viewTableFooter model ]
-
-
-getTotalNumberSelected : Model -> Int
-getTotalNumberSelected model =
-    Dict.values model
-        |> List.foldl
-            (\formatData accumulator ->
-                if formatData.selected then
-                    accumulator + 1
-                else
-                    accumulator
-            )
-            0
 
 
 updateModelQuantity : Model -> Format -> Quantity -> Model
