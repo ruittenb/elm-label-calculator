@@ -44,6 +44,11 @@ target =
     4928
 
 
+maxNrSelected : Int
+maxNrSelected =
+    1
+
+
 addNatural : Int -> Int -> Int
 addNatural a b =
     -- add natural numbers, i.e. not below zero.
@@ -91,8 +96,8 @@ getTotalLabels model =
 model : Model
 model =
     [ { quantity = 0, capacity = 16, selected = False, labelType = "Herma" }
-    , { quantity = 0, capacity = 16, selected = True, labelType = "Avery" }
-    , { quantity = 0, capacity = 24, selected = True, labelType = "OfficeDepot" }
+    , { quantity = 0, capacity = 16, selected = False, labelType = "Avery" }
+    , { quantity = 0, capacity = 24, selected = False, labelType = "OfficeDepot" }
     , { quantity = 0, capacity = 20, selected = False, labelType = "Supermagnete" }
     ]
 
@@ -204,11 +209,8 @@ updateAimForTarget noUpdateDataList toUpdateData =
 updateModelTotalQuantity : LabelType -> Model -> Model
 updateModelTotalQuantity labelType model =
     let
-        ( selectedList, staticList ) =
-            List.partition .selected model
-
-        ( updatedDataList, toUpdateDataList ) =
-            List.partition (\record -> labelType == record.labelType) selectedList
+        ( toUpdateDataList, staticList ) =
+            List.partition (\record -> labelType /= record.labelType && record.selected) model
 
         newModel =
             if List.length toUpdateDataList /= 1 then
@@ -223,7 +225,7 @@ updateModelTotalQuantity labelType model =
                             List.map
                                 (\record ->
                                     if toUpdateData.labelType == record.labelType then
-                                        updateAimForTarget (staticList ++ updatedDataList) toUpdateData
+                                        updateAimForTarget staticList toUpdateData
                                     else
                                         record
                                 )
@@ -260,7 +262,7 @@ updateModelSelected labelType model =
         List.map
             (\record ->
                 if labelType == record.labelType then
-                    { record | selected = not record.selected && totalNrSelected < 2 }
+                    { record | selected = not record.selected && totalNrSelected < maxNrSelected }
                 else
                     record
             )

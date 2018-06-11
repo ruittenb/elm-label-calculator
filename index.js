@@ -9896,10 +9896,10 @@ var _user$project$Main$model = {
 	_0: {quantity: 0, capacity: 16, selected: false, labelType: 'Herma'},
 	_1: {
 		ctor: '::',
-		_0: {quantity: 0, capacity: 16, selected: true, labelType: 'Avery'},
+		_0: {quantity: 0, capacity: 16, selected: false, labelType: 'Avery'},
 		_1: {
 			ctor: '::',
-			_0: {quantity: 0, capacity: 24, selected: true, labelType: 'OfficeDepot'},
+			_0: {quantity: 0, capacity: 24, selected: false, labelType: 'OfficeDepot'},
 			_1: {
 				ctor: '::',
 				_0: {quantity: 0, capacity: 20, selected: false, labelType: 'Supermagnete'},
@@ -9934,20 +9934,6 @@ var _user$project$Main$getTotalNumberSelected = function (model) {
 		0,
 		model);
 };
-var _user$project$Main$updateModelSelected = F2(
-	function (labelType, model) {
-		var totalNrSelected = _user$project$Main$getTotalNumberSelected(model);
-		return A2(
-			_elm_lang$core$List$map,
-			function (record) {
-				return _elm_lang$core$Native_Utils.eq(labelType, record.labelType) ? _elm_lang$core$Native_Utils.update(
-					record,
-					{
-						selected: (!record.selected) && (_elm_lang$core$Native_Utils.cmp(totalNrSelected, 2) < 0)
-					}) : record;
-			},
-			model);
-	});
 var _user$project$Main$onClickPreventDefault = function (message) {
 	var config = {stopPropagation: false, preventDefault: true};
 	return A3(
@@ -9970,6 +9956,21 @@ var _user$project$Main$updateModelQuantity = F3(
 					record,
 					{
 						quantity: A2(_user$project$Main$addNatural, delta, record.quantity)
+					}) : record;
+			},
+			model);
+	});
+var _user$project$Main$maxNrSelected = 1;
+var _user$project$Main$updateModelSelected = F2(
+	function (labelType, model) {
+		var totalNrSelected = _user$project$Main$getTotalNumberSelected(model);
+		return A2(
+			_elm_lang$core$List$map,
+			function (record) {
+				return _elm_lang$core$Native_Utils.eq(labelType, record.labelType) ? _elm_lang$core$Native_Utils.update(
+					record,
+					{
+						selected: (!record.selected) && (_elm_lang$core$Native_Utils.cmp(totalNrSelected, _user$project$Main$maxNrSelected) < 0)
 					}) : record;
 			},
 			model);
@@ -10099,20 +10100,12 @@ var _user$project$Main$updateModelTotalQuantity = F2(
 	function (labelType, model) {
 		var _p2 = A2(
 			_elm_lang$core$List$partition,
-			function (_) {
-				return _.selected;
+			function (record) {
+				return (!_elm_lang$core$Native_Utils.eq(labelType, record.labelType)) && record.selected;
 			},
 			model);
-		var selectedList = _p2._0;
+		var toUpdateDataList = _p2._0;
 		var staticList = _p2._1;
-		var _p3 = A2(
-			_elm_lang$core$List$partition,
-			function (record) {
-				return _elm_lang$core$Native_Utils.eq(labelType, record.labelType);
-			},
-			selectedList);
-		var updatedDataList = _p3._0;
-		var toUpdateDataList = _p3._1;
 		var newModel = function () {
 			if (!_elm_lang$core$Native_Utils.eq(
 				_elm_lang$core$List$length(toUpdateDataList),
@@ -10120,16 +10113,13 @@ var _user$project$Main$updateModelTotalQuantity = F2(
 				return model;
 			} else {
 				var maybeToUpdateData = A2(_elm_community$list_extra$List_Extra$getAt, 0, toUpdateDataList);
-				var _p4 = maybeToUpdateData;
-				if (_p4.ctor === 'Just') {
-					var _p5 = _p4._0;
+				var _p3 = maybeToUpdateData;
+				if (_p3.ctor === 'Just') {
+					var _p4 = _p3._0;
 					return A2(
 						_elm_lang$core$List$map,
 						function (record) {
-							return _elm_lang$core$Native_Utils.eq(_p5.labelType, record.labelType) ? A2(
-								_user$project$Main$updateAimForTarget,
-								A2(_elm_lang$core$Basics_ops['++'], staticList, updatedDataList),
-								_p5) : record;
+							return _elm_lang$core$Native_Utils.eq(_p4.labelType, record.labelType) ? A2(_user$project$Main$updateAimForTarget, staticList, _p4) : record;
 						},
 						model);
 				} else {
@@ -10142,17 +10132,17 @@ var _user$project$Main$updateModelTotalQuantity = F2(
 var _user$project$Main$update = F2(
 	function (msg, model) {
 		var newModel = function () {
-			var _p6 = msg;
-			if (_p6.ctor === 'Add') {
-				var _p8 = _p6._0;
-				return function (_p7) {
+			var _p5 = msg;
+			if (_p5.ctor === 'Add') {
+				var _p7 = _p5._0;
+				return function (_p6) {
 					return A2(
 						_user$project$Main$updateModelTotalQuantity,
-						_p8.labelType,
-						A3(_user$project$Main$updateModelQuantity, _p8.labelType, _p6._1, _p7));
+						_p7.labelType,
+						A3(_user$project$Main$updateModelQuantity, _p7.labelType, _p5._1, _p6));
 				}(model);
 			} else {
-				return A2(_user$project$Main$updateModelSelected, _p6._0.labelType, model);
+				return A2(_user$project$Main$updateModelSelected, _p5._0.labelType, model);
 			}
 		}();
 		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
@@ -10370,7 +10360,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 		init: _user$project$Main$init,
 		update: _user$project$Main$update,
 		view: _user$project$Main$view,
-		subscriptions: function (_p9) {
+		subscriptions: function (_p8) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
