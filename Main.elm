@@ -5,7 +5,9 @@ import Html.Attributes exposing (class, colspan, type_, checked)
 import Html.Events exposing (onClick, onWithOptions)
 import Dict exposing (Dict)
 import Json.Decode as Json
+import List.Extra exposing (getAt)
 import List
+import Debug
 
 
 type alias Quantity =
@@ -20,15 +22,11 @@ type alias LabelType =
     String
 
 
-type alias Selected =
-    Bool
-
-
 type alias LabelData =
     { labelType : LabelType
     , quantity : Quantity
     , capacity : Capacity
-    , selected : Selected
+    , selected : Bool
     }
 
 
@@ -83,6 +81,13 @@ getTotalNumberSelected model =
         model
 
 
+getTotalLabels : Model -> Int
+getTotalLabels model =
+    List.map (\labelData -> labelData.quantity * labelData.capacity) model
+        -- foldl : (a -> b -> b) -> b -> List a -> b
+        |> List.foldl (+) 0
+
+
 model : Model
 model =
     [ { quantity = 0, capacity = 16, selected = False, labelType = "Herma" }
@@ -117,9 +122,7 @@ viewTableFooter model =
                 |> List.foldl (+) 0
 
         totalLabels =
-            List.map (\labelData -> labelData.quantity * labelData.capacity) model
-                -- foldl : (a -> b -> b) -> b -> List a -> b
-                |> List.foldl (+) 0
+            getTotalLabels model
     in
         tr [ class "footer" ]
             [ td [ class "transparent centered" ] [ text <| toString (getTotalNumberSelected model) ]
@@ -128,7 +131,7 @@ viewTableFooter model =
             , td [ class "number quantity" ] [ text <| toString totalQuantity ]
             , td [] []
             , td [] []
-            , td [ class "number" ] [ text <| toString totalLabels ]
+            , td [ class "number" ] [ text <| (toString totalLabels ++ " / " ++ toString target) ]
             ]
 
 
@@ -172,11 +175,73 @@ view model =
             ++ [ viewTableFooter model ]
 
 
-updateModelQuantity : Model -> LabelData -> Quantity -> Model
-updateModelQuantity model labelData delta =
+updateAimForTarget : List LabelData -> LabelData -> LabelData
+updateAimForTarget noUpdateDataList toUpdateData =
+    let
+        -- total number of labels for the no-update list
+        noUpdateTotal =
+            getTotalLabels noUpdateDataList
+
+        -- remainder target for the toUpdateData list
+        toUpdateDataTarget =
+            if target - noUpdateTotal >= 0 then
+                target - noUpdateTotal
+            else
+                0
+
+        _ =
+            Debug.log "toUpdateDataTarget" toUpdateDataTarget
+
+        newQuantity =
+            (toFloat toUpdateDataTarget) / (toFloat toUpdateData.capacity)
+
+        _ =
+            Debug.log "toUpdateDataTarget" newQuantity
+    in
+        { toUpdateData | quantity = round newQuantity }
+
+
+updateModelTotalQuantity : LabelType -> Model -> Model
+updateModelTotalQuantity labelType model =
+    let
+        ( selectedList, staticList ) =
+            List.partition .selected model
+
+        ( updatedDataList, toUpdateDataList ) =
+            List.partition (\record -> labelType == record.labelType) selectedList
+
+        newModel =
+            if List.length toUpdateDataList /= 1 then
+                model
+            else
+                let
+                    maybeToUpdateData =
+                        getAt 0 toUpdateDataList
+                in
+                    case maybeToUpdateData of
+                        Just toUpdateData ->
+                            List.map
+                                (\record ->
+                                    if toUpdateData.labelType == record.labelType then
+                                        updateAimForTarget (staticList ++ updatedDataList) toUpdateData
+                                    else
+                                        record
+                                )
+                                model
+
+                        Nothing ->
+                            model
+    in
+        newModel
+
+
+{-| Update the 'quantity' field of a single labelData record.
+-}
+updateModelQuantity : LabelType -> Quantity -> Model -> Model
+updateModelQuantity labelType delta model =
     List.map
         (\record ->
-            if labelData.labelType == record.labelType then
+            if labelType == record.labelType then
                 { record | quantity = addNatural delta record.quantity }
             else
                 record
@@ -184,15 +249,17 @@ updateModelQuantity model labelData delta =
         model
 
 
-updateModelSelected : Model -> LabelData -> Model
-updateModelSelected model labelData =
+{-| Update the 'selected' status of a single labelData record.
+-}
+updateModelSelected : LabelType -> Model -> Model
+updateModelSelected labelType model =
     let
         totalNrSelected =
             getTotalNumberSelected model
     in
         List.map
             (\record ->
-                if labelData.labelType == record.labelType then
+                if labelType == record.labelType then
                     { record | selected = not record.selected && totalNrSelected < 2 }
                 else
                     record
@@ -206,10 +273,13 @@ update msg model =
         newModel =
             case msg of
                 Add labelData num ->
-                    updateModelQuantity model labelData num
+                    ((updateModelQuantity labelData.labelType num)
+                        >> (updateModelTotalQuantity labelData.labelType)
+                    )
+                        model
 
                 CheckboxToggled labelData ->
-                    updateModelSelected model labelData
+                    updateModelSelected labelData.labelType model
     in
         ( newModel, Cmd.none )
 
