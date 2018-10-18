@@ -201,19 +201,16 @@ updateAimForTarget noUpdateDataList toUpdateData =
 
         -- remainder target for the toUpdateData list
         toUpdateDataTarget =
-            if target - noUpdateTotal >= 0 then
-                target - noUpdateTotal
-            else
-                0
-
-        _ =
-            Debug.log "toUpdateDataTarget" toUpdateDataTarget
+            Debug.log "toUpdateDataTarget" <|
+                if target - noUpdateTotal >= 0 then
+                    target - noUpdateTotal
+                else
+                    0
 
         newQuantity =
-            (toFloat toUpdateDataTarget) / (toFloat toUpdateData.capacity)
-
-        _ =
-            Debug.log "toUpdateDataTarget" newQuantity
+            Debug.log "toUpdateDataTarget" <|
+                (toFloat toUpdateDataTarget)
+                    / (toFloat toUpdateData.capacity)
     in
         { toUpdateData | quantity = round newQuantity }
 
