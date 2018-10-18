@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Html exposing (Html, Attribute, table, tr, th, td, button, input, text)
-import Html.Attributes exposing (class, colspan, type_, checked)
-import Html.Events exposing (onClick, onWithOptions)
+import Html.Attributes exposing (class, colspan, type_, checked, value, size)
+import Html.Events exposing (onClick, onWithOptions, onInput)
 import Dict exposing (Dict)
 import Json.Decode as Json
 import List.Extra exposing (getAt)
@@ -36,6 +36,7 @@ type alias Model =
 
 type Msg
     = Add LabelData Quantity
+      --| Set LabelData Quantity
     | CheckboxToggled LabelData
 
 
@@ -157,7 +158,18 @@ viewTableRow labelData =
             [ button [ onClick (Add labelData -10) ] [ text "-10" ]
             , button [ onClick (Add labelData -1) ] [ text "-1" ]
             ]
-        , td [ class "number quantity" ] [ text <| toString labelData.quantity ]
+
+        --        , td [ class "number quantity" ] [ text <| toString labelData.quantity ]
+        , td [ class "number quantity" ]
+            [ input
+                [ value <| toString labelData.quantity
+                , size 3
+                , type_ "text"
+
+                -- onInput
+                ]
+                []
+            ]
         , td []
             [ button [ onClick (Add labelData 1) ] [ text "+1" ]
             , button [ onClick (Add labelData 10) ] [ text "+10" ]
