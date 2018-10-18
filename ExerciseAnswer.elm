@@ -1,12 +1,9 @@
-module Undefined exposing (..)
+module ExerciseAnswer exposing (..)
 
 import Html exposing (Html, table, tr, td, button, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import List
-
-
--- This program contains a bug. The formatting (color: red) does not show. Why?
 
 
 type alias Model =
@@ -19,7 +16,7 @@ type Msg
 
 model : Model
 model =
-    [ 1, 2, 3 ]
+    [ 0, 2, 3 ]
 
 
 limit : Int
@@ -32,25 +29,29 @@ getTotal model =
     List.foldl (+) 0 model
 
 
-viewTableCell : Int -> Html Msg
-viewTableCell num =
+viewTableCell : Model -> Int -> Html Msg
+viewTableCell model num =
     let
-        attributes =
+        styleAttributes =
             if getTotal model > limit then
-                [ style [ ( "color", "red" ) ] ]
+                [ ( "color", "red" ) ]
             else
                 []
     in
-        td attributes [ text <| toString num ]
+        td [ style styleAttributes ] [ text <| toString num ]
 
 
 view : Model -> Html Msg
 view model =
-    table []
-        [ tr [] <|
-            button [ onClick IncrementAll ] [ text "Increment All" ]
-                :: List.map viewTableCell model
-        ]
+    let
+        viewTableCellModel =
+            viewTableCell model
+    in
+        table []
+            [ tr [] <|
+                button [ onClick IncrementAll ] [ text "Increment All" ]
+                    :: List.map viewTableCellModel model
+            ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
