@@ -10086,10 +10086,14 @@ var _user$project$Main$viewTableFooter = function (model) {
 var _user$project$Main$updateAimForTarget = F2(
 	function (noUpdateDataList, toUpdateData) {
 		var noUpdateTotal = _user$project$Main$getTotalLabels(noUpdateDataList);
-		var toUpdateDataTarget = (_elm_lang$core$Native_Utils.cmp(_user$project$Main$target - noUpdateTotal, 0) > -1) ? (_user$project$Main$target - noUpdateTotal) : 0;
-		var _p0 = A2(_elm_lang$core$Debug$log, 'toUpdateDataTarget', toUpdateDataTarget);
-		var newQuantity = _elm_lang$core$Basics$toFloat(toUpdateDataTarget) / _elm_lang$core$Basics$toFloat(toUpdateData.capacity);
-		var _p1 = A2(_elm_lang$core$Debug$log, 'toUpdateDataTarget', newQuantity);
+		var toUpdateDataTarget = A2(
+			_elm_lang$core$Debug$log,
+			'toUpdateDataTarget',
+			(_elm_lang$core$Native_Utils.cmp(_user$project$Main$target - noUpdateTotal, 0) > -1) ? (_user$project$Main$target - noUpdateTotal) : 0);
+		var newQuantity = A2(
+			_elm_lang$core$Debug$log,
+			'toUpdateDataTarget',
+			_elm_lang$core$Basics$toFloat(toUpdateDataTarget) / _elm_lang$core$Basics$toFloat(toUpdateData.capacity));
 		return _elm_lang$core$Native_Utils.update(
 			toUpdateData,
 			{
@@ -10098,14 +10102,14 @@ var _user$project$Main$updateAimForTarget = F2(
 	});
 var _user$project$Main$updateModelTotalQuantity = F2(
 	function (labelType, model) {
-		var _p2 = A2(
+		var _p0 = A2(
 			_elm_lang$core$List$partition,
 			function (record) {
 				return (!_elm_lang$core$Native_Utils.eq(labelType, record.labelType)) && record.selected;
 			},
 			model);
-		var toUpdateDataList = _p2._0;
-		var staticList = _p2._1;
+		var toUpdateDataList = _p0._0;
+		var staticList = _p0._1;
 		var newModel = function () {
 			if (!_elm_lang$core$Native_Utils.eq(
 				_elm_lang$core$List$length(toUpdateDataList),
@@ -10113,13 +10117,13 @@ var _user$project$Main$updateModelTotalQuantity = F2(
 				return model;
 			} else {
 				var maybeToUpdateData = A2(_elm_community$list_extra$List_Extra$getAt, 0, toUpdateDataList);
-				var _p3 = maybeToUpdateData;
-				if (_p3.ctor === 'Just') {
-					var _p4 = _p3._0;
+				var _p1 = maybeToUpdateData;
+				if (_p1.ctor === 'Just') {
+					var _p2 = _p1._0;
 					return A2(
 						_elm_lang$core$List$map,
 						function (record) {
-							return _elm_lang$core$Native_Utils.eq(_p4.labelType, record.labelType) ? A2(_user$project$Main$updateAimForTarget, staticList, _p4) : record;
+							return _elm_lang$core$Native_Utils.eq(_p2.labelType, record.labelType) ? A2(_user$project$Main$updateAimForTarget, staticList, _p2) : record;
 						},
 						model);
 				} else {
@@ -10132,17 +10136,17 @@ var _user$project$Main$updateModelTotalQuantity = F2(
 var _user$project$Main$update = F2(
 	function (msg, model) {
 		var newModel = function () {
-			var _p5 = msg;
-			if (_p5.ctor === 'Add') {
-				var _p7 = _p5._0;
-				return function (_p6) {
+			var _p3 = msg;
+			if (_p3.ctor === 'Add') {
+				var _p5 = _p3._0;
+				return function (_p4) {
 					return A2(
 						_user$project$Main$updateModelTotalQuantity,
-						_p7.labelType,
-						A3(_user$project$Main$updateModelQuantity, _p7.labelType, _p5._1, _p6));
+						_p5.labelType,
+						A3(_user$project$Main$updateModelQuantity, _p5.labelType, _p3._1, _p4));
 				}(model);
 			} else {
-				return A2(_user$project$Main$updateModelSelected, _p5._0.labelType, model);
+				return A2(_user$project$Main$updateModelSelected, _p3._0.labelType, model);
 			}
 		}();
 		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
@@ -10375,7 +10379,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 		init: _user$project$Main$init,
 		update: _user$project$Main$update,
 		view: _user$project$Main$view,
-		subscriptions: function (_p8) {
+		subscriptions: function (_p6) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

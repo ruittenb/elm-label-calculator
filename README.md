@@ -3,7 +3,7 @@
 This is a tool for calculating how many labels fit on sticker sheets.
 It consists of a simple Node.js web server and an Elm SPA.
 
-## Ingredients and dependencies:
+## Prerequisites and installation:
 
 - [Install Elm](http://elm-lang.org/install)
 - [Install Node](https://nodejs.org/en/download/)
@@ -11,7 +11,7 @@ It consists of a simple Node.js web server and an Elm SPA.
 Next, install the server dependencies, by running
 
 ```
-npm install
+make install
 ```
 
 ## Running the application:
