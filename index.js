@@ -9828,6 +9828,17 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$Main$updateSetModelQuantity = F3(
+	function (labelType, value, model) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (record) {
+				return _elm_lang$core$Native_Utils.eq(labelType, record.labelType) ? _elm_lang$core$Native_Utils.update(
+					record,
+					{quantity: value}) : record;
+			},
+			model);
+	});
 var _user$project$Main$viewTableHeader = A2(
 	_elm_lang$html$Html$tr,
 	{ctor: '[]'},
@@ -10136,16 +10147,26 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		var newModel = function () {
 			var _p3 = msg;
-			if (_p3.ctor === 'Add') {
-				var _p5 = _p3._0;
-				return function (_p4) {
+			switch (_p3.ctor) {
+				case 'Add':
+					var _p4 = _p3._0;
 					return A2(
 						_user$project$Main$updateModelTotalQuantity,
-						_p5.labelType,
-						A3(_user$project$Main$updateModelQuantity, _p5.labelType, _p3._1, _p4));
-				}(model);
-			} else {
-				return A2(_user$project$Main$updateModelSelected, _p3._0.labelType, model);
+						_p4.labelType,
+						A3(_user$project$Main$updateModelQuantity, _p4.labelType, _p3._1, model));
+				case 'Set':
+					var _p6 = _p3._0;
+					var _p5 = _elm_lang$core$String$toInt(_p3._1);
+					if (_p5.ctor === 'Err') {
+						return model;
+					} else {
+						return A2(
+							_user$project$Main$updateModelTotalQuantity,
+							_p6.labelType,
+							A3(_user$project$Main$updateSetModelQuantity, _p6.labelType, _p5._0, model));
+					}
+				default:
+					return A2(_user$project$Main$updateModelSelected, _p3._0.labelType, model);
 			}
 		}();
 		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
@@ -10157,6 +10178,10 @@ var _user$project$Main$LabelData = F4(
 var _user$project$Main$CheckboxToggled = function (a) {
 	return {ctor: 'CheckboxToggled', _0: a};
 };
+var _user$project$Main$Set = F2(
+	function (a, b) {
+		return {ctor: 'Set', _0: a, _1: b};
+	});
 var _user$project$Main$Add = F2(
 	function (a, b) {
 		return {ctor: 'Add', _0: a, _1: b};
@@ -10266,7 +10291,12 @@ var _user$project$Main$viewTableRow = function (labelData) {
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$type_('text'),
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onInput(
+														_user$project$Main$Set(labelData)),
+													_1: {ctor: '[]'}
+												}
 											}
 										}
 									},
@@ -10378,7 +10408,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 		init: _user$project$Main$init,
 		update: _user$project$Main$update,
 		view: _user$project$Main$view,
-		subscriptions: function (_p6) {
+		subscriptions: function (_p7) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

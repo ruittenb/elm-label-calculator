@@ -36,7 +36,7 @@ type alias Model =
 
 type Msg
     = Add LabelData Quantity
-      --| Set LabelData Quantity
+    | Set LabelData String
     | CheckboxToggled LabelData
 
 
@@ -161,8 +161,7 @@ viewTableRow labelData =
                 [ value <| toString labelData.quantity
                 , size 3
                 , type_ "text"
-
-                -- onInput
+                , onInput <| Set labelData
                 ]
                 []
             ]
@@ -244,12 +243,24 @@ updateModelTotalQuantity labelType model =
 
 {-| Update the 'quantity' field of a single labelData record.
 -}
-updateModelQuantity : LabelType -> Quantity -> Model -> Model
-updateModelQuantity labelType delta model =
+updateAddModelQuantity : LabelType -> Quantity -> Model -> Model
+updateAddModelQuantity labelType delta model =
     List.map
         (\record ->
             if labelType == record.labelType then
                 { record | quantity = addNatural delta record.quantity }
+            else
+                record
+        )
+        model
+
+
+updateSetModelQuantity : LabelType -> Quantity -> Model -> Model
+updateSetModelQuantity labelType value model =
+    List.map
+        (\record ->
+            if labelType == record.labelType then
+                { record | quantity = value }
             else
                 record
         )
@@ -280,10 +291,19 @@ update msg model =
         newModel =
             case msg of
                 Add labelData num ->
-                    ((updateModelQuantity labelData.labelType num)
-                        >> (updateModelTotalQuantity labelData.labelType)
-                    )
-                        model
+                    model
+                        |> (updateAddModelQuantity labelData.labelType num)
+                        |> (updateModelTotalQuantity labelData.labelType)
+
+                Set labelData str ->
+                    case String.toInt str of
+                        Err _ ->
+                            model
+
+                        Ok num ->
+                            model
+                                |> (updateSetModelQuantity labelData.labelType num)
+                                |> (updateModelTotalQuantity labelData.labelType)
 
                 CheckboxToggled labelData ->
                     updateModelSelected labelData.labelType model
