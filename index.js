@@ -9835,7 +9835,9 @@ var _user$project$Main$updateSetModelQuantity = F3(
 			function (record) {
 				return _elm_lang$core$Native_Utils.eq(labelType, record.labelType) ? _elm_lang$core$Native_Utils.update(
 					record,
-					{quantity: value}) : record;
+					{
+						quantity: (_elm_lang$core$Native_Utils.cmp(value, 0) < 0) ? 0 : value
+					}) : record;
 			},
 			model);
 	});
@@ -9957,7 +9959,7 @@ var _user$project$Main$addNatural = F2(
 	function (a, b) {
 		return (_elm_lang$core$Native_Utils.cmp(a + b, 0) < 0) ? 0 : (a + b);
 	});
-var _user$project$Main$updateModelQuantity = F3(
+var _user$project$Main$updateAddModelQuantity = F3(
 	function (labelType, delta, model) {
 		return A2(
 			_elm_lang$core$List$map,
@@ -10153,7 +10155,7 @@ var _user$project$Main$update = F2(
 					return A2(
 						_user$project$Main$updateModelTotalQuantity,
 						_p4.labelType,
-						A3(_user$project$Main$updateModelQuantity, _p4.labelType, _p3._1, model));
+						A3(_user$project$Main$updateAddModelQuantity, _p4.labelType, _p3._1, model));
 				case 'Set':
 					var _p6 = _p3._0;
 					var _p5 = _elm_lang$core$String$toInt(_p3._1);
@@ -10290,12 +10292,16 @@ var _user$project$Main$viewTableRow = function (labelData) {
 											_0: _elm_lang$html$Html_Attributes$size(3),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$type_('text'),
+												_0: _elm_lang$html$Html_Attributes$type_('number'),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html_Events$onInput(
 														_user$project$Main$Set(labelData)),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'min', '0'),
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										}

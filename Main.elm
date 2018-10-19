@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (Html, Attribute, table, tr, th, td, button, input, text)
-import Html.Attributes exposing (class, colspan, type_, checked, value, size)
+import Html.Attributes exposing (class, colspan, type_, checked, value, size, attribute)
 import Html.Events exposing (onClick, onWithOptions, onInput)
 import Dict exposing (Dict)
 import Json.Decode as Json
@@ -160,8 +160,9 @@ viewTableRow labelData =
             [ input
                 [ value <| toString labelData.quantity
                 , size 3
-                , type_ "text"
+                , type_ "number"
                 , onInput <| Set labelData
+                , attribute "min" "0"
                 ]
                 []
             ]
@@ -260,7 +261,13 @@ updateSetModelQuantity labelType value model =
     List.map
         (\record ->
             if labelType == record.labelType then
-                { record | quantity = value }
+                { record
+                    | quantity =
+                        if value < 0 then
+                            0
+                        else
+                            value
+                }
             else
                 record
         )
