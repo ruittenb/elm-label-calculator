@@ -53,14 +53,10 @@ maxNrSelected =
 addNatural : Int -> Int -> Int
 addNatural a b =
     -- add natural numbers, i.e. not below zero.
-    let
-        total =
-            a + b
-    in
-        if total < 0 then
-            0
-        else
-            total
+    if a + b < 0 then
+        0
+    else
+        a + b
 
 
 onClickPreventDefault : msg -> Attribute msg

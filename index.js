@@ -9944,8 +9944,7 @@ var _user$project$Main$onClickPreventDefault = function (message) {
 };
 var _user$project$Main$addNatural = F2(
 	function (a, b) {
-		var total = a + b;
-		return (_elm_lang$core$Native_Utils.cmp(total, 0) < 0) ? 0 : total;
+		return (_elm_lang$core$Native_Utils.cmp(a + b, 0) < 0) ? 0 : (a + b);
 	});
 var _user$project$Main$updateModelQuantity = F3(
 	function (labelType, delta, model) {

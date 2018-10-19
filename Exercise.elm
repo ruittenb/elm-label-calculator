@@ -19,12 +19,12 @@ type Msg
 
 model : Model
 model =
-    [ 0, 2, 3 ]
+    [ 0, 1, 3 ]
 
 
 limit : Int
 limit =
-    13
+    14
 
 
 getTotal : Model -> Int

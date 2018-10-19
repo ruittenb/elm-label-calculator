@@ -23,4 +23,3 @@ make run
 ```
 
 This should open index.html in a browser.
-
