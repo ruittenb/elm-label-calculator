@@ -53,19 +53,16 @@ view model =
         ]
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     -- there is only one msg
-    ( List.map ((+) 1) model
-    , Cmd.none
-    )
+    List.map ((+) 1) model
 
 
 main : Program Never Model Msg
 main =
-    Html.program
-        { init = ( model, Cmd.none )
+    Html.beginnerProgram
+        { model = model
         , update = update
         , view = view
-        , subscriptions = \_ -> Sub.none
         }
